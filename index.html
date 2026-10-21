@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Couples Check-In Worksheet</title>
+<style>
+  :root{
+    --ink:#ece7f5;
+    --muted:#9d94b3;
+    --line:#2e2740;
+    --card:#191428;
+    --bg1:#0f0b1a;
+    --bg2:#151026;
+    --field:#221a36;
+    --field-focus:#2a2142;
+    --accent1:#f56fa8;
+    --accent2:#8f7bff;
+    --good:#3fd39a;
+    --shadow:0 12px 34px rgba(0,0,0,.45);
+    --shadow-sm:0 3px 12px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1200px 620px at 12% -12%, rgba(245,111,168,.16) 0%, transparent 55%),
+      radial-gradient(1100px 620px at 100% 0%, rgba(143,123,255,.16) 0%, transparent 52%),
+      linear-gradient(180deg,var(--bg1),var(--bg2));
+    background-attachment:fixed;
+    color:var(--ink);
+    font:15.5px/1.6 ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding:0 16px 140px;
+  }
+  .wrap{max-width:880px;margin:0 auto}
+
+  /* ---------- header ---------- */
+  header.hero{
+    text-align:center;
+    padding:44px 10px 12px;
+  }
+  .hero .kicker{
+    display:inline-block;font-size:12px;font-weight:700;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent1);
+    background:rgba(224,83,138,.10);border:1px solid rgba(224,83,138,.22);
+    padding:5px 12px;border-radius:999px;margin-bottom:16px;
+  }
+  .hero h1{
+    margin:0 0 10px;font-size:clamp(27px,5vw,40px);line-height:1.12;letter-spacing:-.02em;
+    background:linear-gradient(100deg,var(--accent1),var(--accent2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .hero p.sub{margin:0 auto;max-width:560px;color:var(--muted);font-size:15px}
+
+  /* ---------- progress ---------- */
+  .progress-shell{margin:26px auto 6px;max-width:560px}
+  .progress-top{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:7px;font-weight:600}
+  .bar{height:10px;border-radius:999px;background:rgba(143,123,255,.16);overflow:hidden}
+  .bar > i{
+    display:block;height:100%;width:0%;border-radius:999px;
+    background:linear-gradient(90deg,var(--accent1),var(--accent2));
+    transition:width .35s cubic-bezier(.22,1,.36,1);
+  }
+
+  /* ---------- toolbar ---------- */
+  .toolbar{
+    position:sticky;top:0;z-index:30;
+    display:flex;gap:9px;flex-wrap:wrap;justify-content:center;
+    margin:22px 0 26px;padding:12px 10px;
+    background:rgba(25,20,40,.72);backdrop-filter:blur(12px);
+    border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-sm);
+  }
+  button{
+    font:inherit;font-weight:650;cursor:pointer;border:1px solid var(--line);
+    background:var(--field);color:var(--ink);padding:10px 17px;border-radius:11px;
+    box-shadow:var(--shadow-sm);transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease,filter .12s ease;
+  }
+  button:hover{transform:translateY(-1px);border-color:#453a63;box-shadow:var(--shadow)}
+  button:active{transform:translateY(0)}
+  button.primary{
+    border:none;color:#fff;
+    background:linear-gradient(100deg,var(--accent1),var(--accent2));
+    box-shadow:0 8px 20px rgba(124,108,246,.32);
+  }
+  button.primary:hover{filter:brightness(1.05)}
+
+  /* ---------- sections ---------- */
+  section.card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:22px 22px 10px;margin:18px 0;box-shadow:var(--shadow);
+    animation:rise .5s cubic-bezier(.22,1,.36,1) both;
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  section.card h2{
+    display:flex;align-items:center;gap:12px;margin:0 0 3px;font-size:17.5px;letter-spacing:-.01em;
+  }
+  section.card h2 .num{
+    flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:9px;
+    font-size:13px;font-weight:800;color:#fff;
+    background:linear-gradient(135deg,var(--accent1),var(--accent2));
+  }
+  section.card .blurb{color:var(--muted);font-size:13px;margin:0 0 4px 42px}
+
+  .q{margin:20px 0 14px;padding-left:14px;border-left:3px solid transparent;border-radius:2px;transition:border-color .25s ease}
+  .q.filled{border-left-color:rgba(63,211,154,.6)}
+  .q label{display:block;font-weight:650;font-size:14.5px;margin:0 0 3px;position:relative}
+  .q .why{color:var(--muted);font-size:12.5px;margin:0 0 9px;line-height:1.45}
+  .q textarea{
+    width:100%;background:var(--field);color:var(--ink);
+    border:1px solid var(--line);border-radius:11px;padding:11px 13px;
+    font:inherit;font-size:14.5px;resize:vertical;min-height:56px;
+    transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;
+  }
+  .q textarea::placeholder{color:#6f6787}
+  .q textarea:focus{
+    outline:none;border-color:var(--accent2);background:var(--field-focus);
+    box-shadow:0 0 0 4px rgba(143,123,255,.20);
+  }
+  .q .tick{
+    display:none;position:absolute;right:0;top:1px;font-size:11.5px;font-weight:800;color:var(--good);
+    background:rgba(63,211,154,.14);border:1px solid rgba(63,211,154,.34);
+    padding:1px 8px;border-radius:999px;
+  }
+  .q.filled .tick{display:inline-block}
+
+  /* ---------- output ---------- */
+  .out{margin-top:36px}
+  .out .head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+  .out h2{margin:0;font-size:19px;letter-spacing:-.01em}
+  .out .pill{font-size:12px;font-weight:700;color:var(--muted);border:1px solid var(--line);background:var(--field);padding:4px 11px;border-radius:999px;box-shadow:var(--shadow-sm)}
+  #final{
+    width:100%;min-height:360px;background:#120d1f;color:var(--ink);
+    border:1px solid var(--line);border-radius:14px;padding:18px;
+    font:13px/1.65 ui-monospace,SFMono-Regular,Menlo,Consolas,"Cascadia Code",monospace;
+    white-space:pre-wrap;box-shadow:var(--shadow);
+  }
+  .footer-note{color:var(--muted);font-size:12.5px;margin-top:11px;text-align:center}
+
+  /* ---------- toast ---------- */
+  .toast{
+    position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(24px);
+    background:#2a2142;color:#fff;font-weight:650;padding:11px 20px;border-radius:12px;border:1px solid #453a63;
+    opacity:0;pointer-events:none;transition:.28s cubic-bezier(.22,1,.36,1);font-size:14px;z-index:80;
+    box-shadow:0 14px 34px rgba(0,0,0,.55);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @media print{
+    body{background:#fff;color:#000;padding:0}
+    .toolbar,.toast,.progress-shell{display:none}
+    section.card,.out{break-inside:avoid;box-shadow:none;border-color:#ccc}
+    section.card{background:#fff;color:#000}
+    #final{background:#fff;color:#000;border-color:#ccc}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <span class="kicker">For two</span>
+    <h1>Couples Check-In Worksheet</h1>
+    <p class="sub">A gentle set of questions to talk through together — or fill in separately, then compare. It lives entirely in this file; nothing is uploaded anywhere.</p>
+    <div class="progress-shell">
+      <div class="progress-top"><span id="pcount">0 of 0 answered</span><span id="ppct">0%</span></div>
+      <div class="bar"><i id="pbar"></i></div>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <button class="primary" onclick="generate()">✎ Generate final version</button>
+    <button onclick="copyOut()">⧉ Copy</button>
+    <button onclick="downloadTxt()">⤓ Save .txt</button>
+    <button onclick="document.getElementById('filein').click()">⌲ Load .txt</button>
+    <button onclick="clearAll()">✕ Clear all</button>
+    <input id="filein" type="file" accept=".txt,text/plain" hidden onchange="loadFile(event)">
+  </div>
+
+  <div id="form"></div>
+
+  <div class="out">
+    <div class="head">
+      <h2>Final version</h2>
+      <span class="pill" id="outcount">0 answered</span>
+    </div>
+    <textarea id="final" readonly placeholder="Your compiled answers appear here. Click “Generate final version”, then Save .txt to keep it. Later, use “Load .txt” to reopen this file and change anything."></textarea>
+    <p class="footer-note">Save the .txt to revisit later — load it back here to update your answers anytime.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast">Copied</div>
+
+<script>
+/* ==== PURE-LOGIC (testable, no DOM) ==== */
+const DATA = [
+  { title:"Where we stand", blurb:"Take stock of the relationship as it is right now.", qs:[
+    ["How would each of you describe how we're doing right now?", "Names the honest baseline, good or bad."],
+    ["What's been going well lately?", "Starts on what already works."],
+    ["What's felt hard or off?", "Surfaces problems before they grow."],
+    ["How satisfied are you with how we spend time together?", "Shows where the time actually goes."],
+    ["What do you each want more of?", "Turns vague longing into a clear ask."],
+    ["What would make you feel closer this month?", "Gives a near-term, doable goal."],
+  ]},
+  { title:"Communication & conflict", blurb:"How you talk, and how you repair.", qs:[
+    ["How do you each like to be approached with something difficult?", "Prevents 'the wrong way' from derailing the message."],
+    ["What's your usual way of handling a disagreement?", "Makes the pattern visible."],
+    ["What helps you calm down when things get heated?", "A practical pause plan."],
+    ["How do you prefer to make up after a fight?", "Repair matters more than the fight."],
+    ["What do you wish the other understood without you saying it?", "The unspoken thing a partner can't read."],
+    ["How can we make it easier to apologize and move on?", "Lowers the cost of saying sorry."],
+  ]},
+  { title:"Trust & boundaries", blurb:"What safety looks like for each of you.", qs:[
+    ["What makes you feel secure in this relationship?", "Names the actual ingredients of trust."],
+    ["Where do you each draw the line on time, attention, or privacy?", "Clarifies expectations before assumptions."],
+    ["How do you feel about each other's friendships and social life?", "Catches insecurity or pressure early."],
+    ["What's shared between us, and what stays private?", "Sets the default outside the relationship."],
+    ["How should we handle it if one of us feels uneasy about something?", "Creates an easy outlet before it festers."],
+    ["What would help you trust more?", "Turns 'trust me' into something concrete."],
+  ]},
+  { title:"Emotional connection", blurb:"Closeness beyond the day-to-day.", qs:[
+    ["When do you feel most connected to each other?", "Repeat what already works."],
+    ["How do you each like to be comforted?", "Matches care to what actually lands."],
+    ["How do you like to be shown appreciation?", "Small gestures, correctly aimed."],
+    ["What are you each carrying right now that the other should know?", "Shares the weight being held quietly."],
+    ["What does feeling loved look like for you?", "Translates feeling into practice."],
+    ["How can we protect time to just be together?", "Puts connection on the calendar."],
+  ]},
+  { title:"Intimacy & physical closeness", blurb:"Warmth, affection, and desire.", qs:[
+    ["How satisfied are you with the affection in our relationship?", "An honest read, without pressure."],
+    ["How do you each like to be approached for closeness?", "Respects different rhythms."],
+    ["What makes you feel wanted?", "Tells a partner what to do more of."],
+    ["Is there anything you'd like more, or less, of?", "Preferences shift — check in."],
+    ["How do you each handle mismatched moods?", "Normalizes the mismatch."],
+    ["What would help you feel more comfortable talking about it?", "Keeps the topic from being taboo."],
+  ]},
+  { title:"Time, space & independence", blurb:"Together and apart, both healthy.", qs:[
+    ["How much time together feels right for each of you?", "Aligns a common friction point."],
+    ["What do you each need to recharge on your own?", "Space is not rejection."],
+    ["How do you feel about each other's hobbies and friendships?", "Protects outside lives."],
+    ["How do you handle needing a night off?", "A no-guilt way to ask."],
+    ["What does a good balance look like for us?", "A shared picture, not just complaints."],
+    ["How can we respect each other's independence?", "Turns freedom into trust."],
+  ]},
+  { title:"Money & practical life", blurb:"The unglamorous glue.", qs:[
+    ["How do you each feel about how we handle money?", "Boring, but a common source of friction."],
+    ["What are our shared vs. personal costs?", "Draws the line clearly."],
+    ["How should we make big spending decisions together?", "Prevents surprises."],
+    ["How do we divide everyday chores and responsibilities?", "Fairness beats guessing."],
+    ["What do you each worry about practically?", "Names the quiet stress."],
+    ["What would make daily life feel easier?", "A concrete quality-of-life ask."],
+  ]},
+  { title:"Family, friends & the outside world", blurb:"Who else is in the picture.", qs:[
+    ["How do you each feel about time with each other's family?", "Balances closeness and strain."],
+    ["What do we tell others about us, and when?", "Controls the story together."],
+    ["How do we handle friends or family who create tension?", "A united front, calmly."],
+    ["How much do we want to share with people close to us?", "Aligns openness."],
+    ["What events or obligations matter most to each of you?", "Protects what each person values."],
+    ["How can we support each other socially?", "Teamwork, not rivalry."],
+  ]},
+  { title:"Values, goals & the future", blurb:"Where this is heading.", qs:[
+    ["What matters most to each of you in life?", "Values steer everything else."],
+    ["What are your hopes for the next year?", "Near-term direction."],
+    ["How do you picture our future together?", "Catches mismatched pictures."],
+    ["What are you each working toward right now?", "Support the actual goal."],
+    ["Where would you like us to be in a few years?", "Longer horizon, without pressure."],
+    ["Is there a dream you haven't shared yet?", "Makes room for the big thing."],
+  ]},
+  { title:"Checking in & growing", blurb:"How you keep this alive.", qs:[
+    ["How often would you like to have a check-in like this?", "Keeps the habit from dying."],
+    ["What's one small thing we could each do more of?", "Low-effort, high-return."],
+    ["How will we know things are going well?", "Defines a healthy signal."],
+    ["What should we do when we drift apart?", "Plans for the normal dip."],
+    ["What do you each want to work on personally?", "Growth inside the relationship."],
+    ["What do you hope we look back on and smile about?", "Ends on the shared picture."],
+  ]},
+];
+
+function norm(s){
+  return String(s||'').replace(/\s+/g,' ').trim().toLowerCase();
+}
+
+function buildText(ans){
+  const L=[];
+  L.push('COUPLES CHECK-IN WORKSHEET');
+  L.push('A check-in for two — fill it in together or separately, then compare.');
+  L.push('');
+  DATA.forEach((sec,si)=>{
+    L.push('='.repeat(52));
+    L.push((si+1)+'. '+sec.title.toUpperCase());
+    L.push('='.repeat(52));
+    L.push('');
+    sec.qs.forEach((q,qi)=>{
+      const v = ans['q_'+si+'_'+qi];
+      L.push(q[0]);
+      if(v && v.length){
+        v.split('\n').forEach(line=> L.push('> '+line));
+      } else {
+        L.push('> —');
+      }
+      L.push('');
+    });
+  });
+  L.push('— End —');
+  return L.join('\n');
+}
+
+function parseText(text){
+  const ans = {};
+  // map normalized question text -> id
+  const qIndex = {};
+  DATA.forEach((sec,si)=> sec.qs.forEach((q,qi)=> qIndex[norm(q[0])] = 'q_'+si+'_'+qi ));
+  const secTitles = {};
+  DATA.forEach((sec,si)=> secTitles[norm(sec.title)] = si );
+
+  let current = null;
+  String(text||'').split(/\r?\n/).forEach(raw=>{
+    const line = raw.replace(/\r$/,'');
+    const trimmed = line.trim();
+    const n = norm(trimmed);
+
+    if(!trimmed){ return; }
+
+    if(qIndex[n] !== undefined){ current = qIndex[n]; return; }
+
+    // section header: "3. VALUES, GOALS & THE FUTURE"
+    const m = trimmed.match(/^(\d+)\.\s+(.+)$/);
+    if(m){
+      const t = norm(m[2]);
+      if(secTitles[t] !== undefined || /^[A-Z0-9 ,&'\-]+$/.test(m[2])){ current = null; return; }
+    }
+    if(/^=+$/.test(trimmed) || /^—\s*end\s*—$/i.test(trimmed) || trimmed==='COUPLES CHECK-IN WORKSHEET'){ return; }
+
+    if(current && line.startsWith('>')){
+      const val = line.replace(/^>\s?/,'');
+      if(val === '—' && !ans[current]) return; // skip placeholder
+      ans[current] = ans[current] ? (ans[current]+'\n'+val) : val;
+    }
+  });
+  return ans;
+}
+/* ==== END PURE-LOGIC ==== */
+
+/* ---------- state / persistence ---------- */
+const STORE='couples_worksheet_v1';
+
+function collect(){
+  const a={};
+  document.querySelectorAll('textarea[id^="q_"]').forEach(t=> a[t.id]=t.value.trim());
+  return a;
+}
+function save(){ try{ localStorage.setItem(STORE, JSON.stringify(collect())); }catch(e){} }
+function setAnswers(ans){
+  Object.keys(ans||{}).forEach(k=>{ const el=document.getElementById(k); if(el){ el.value=ans[k]; } });
+  paint(); save();
+}
+function completedCount(a){ return Object.values(a).filter(v=>v && v.length).length; }
+function totalCount(){ let n=0; DATA.forEach(s=>n+=s.qs.length); return n; }
+
+function paint(){
+  const a=collect();
+  document.querySelectorAll('.q').forEach(q=>{
+    const ta=q.querySelector('textarea');
+    q.classList.toggle('filled', !!(ta.value && ta.value.trim()));
+  });
+  const done=completedCount(a), tot=totalCount();
+  const pct = tot? Math.round(done/tot*100):0;
+  document.getElementById('pcount').textContent = done+' of '+tot+' answered';
+  document.getElementById('ppct').textContent = pct+'%';
+  document.getElementById('pbar').style.width = pct+'%';
+  const oc=document.getElementById('outcount'); if(oc) oc.textContent = done+' answered';
+}
+
+/* ---------- build form ---------- */
+const form=document.getElementById('form');
+DATA.forEach((sec,si)=>{
+  const s=document.createElement('section');
+  s.className='card';
+  s.style.animationDelay=(si*40)+'ms';
+  s.innerHTML = `<h2><span class="num">${si+1}</span>${sec.title}</h2>
+    <p class="blurb">${sec.blurb||''}</p>`;
+  sec.qs.forEach((q,qi)=>{
+    const id='q_'+si+'_'+qi;
+    const d=document.createElement('div');
+    d.className='q';
+    d.innerHTML = `<label for="${id}">${q[0]}<span class="tick">✓ answered</span></label>
+      <div class="why">${q[1]}</div>
+      <textarea id="${id}" rows="2" placeholder="Type your answer…"></textarea>`;
+    s.appendChild(d);
+  });
+  form.appendChild(s);
+});
+
+/* ---------- actions ---------- */
+function generate(){
+  const out = buildText(collect());
+  document.getElementById('final').value = out;
+  save(); paint();
+  document.getElementById('final').scrollIntoView({behavior:'smooth',block:'start'});
+  toast('Final version ready');
+}
+
+function copyOut(){
+  const el=document.getElementById('final');
+  if(!el.value){ toast('Generate first'); return; }
+  el.select();
+  navigator.clipboard.writeText(el.value).then(
+    ()=>{ toast('Copied ✓'); },
+    ()=>{ try{ document.execCommand('copy'); toast('Copied ✓'); }catch(e){ toast('Copy failed'); } }
+  );
+}
+
+function downloadTxt(){
+  const el=document.getElementById('final');
+  if(!el.value) generate();
+  const blob=new Blob([document.getElementById('final').value],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='couples-checkin-worksheet.txt';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(a.href);
+  toast('Saved .txt');
+}
+
+function loadFile(ev){
+  const f=ev.target.files && ev.target.files[0];
+  if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    const parsed = parseText(String(r.result||''));
+    const found = Object.keys(parsed).length;
+    if(!found){ toast('No answers found in that file'); return; }
+    setAnswers(parsed);
+    document.getElementById('final').value = buildText(parsed);
+    paint();
+    toast('Loaded '+found+' answers');
+  };
+  r.readAsText(f);
+  ev.target.value='';
+}
+
+function clearAll(){
+  if(!confirm('Clear all answers? This cannot be undone.')) return;
+  document.querySelectorAll('textarea[id^="q_"]').forEach(t=> t.value='');
+  document.getElementById('final').value='';
+  try{ localStorage.removeItem(STORE); }catch(e){}
+  paint(); toast('Cleared');
+}
+
+let toastTimer;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),1700);
+}
+
+/* ---------- boot ---------- */
+form.addEventListener('input', ()=>{ save(); paint(); });
+try{ const raw=localStorage.getItem(STORE); if(raw) setAnswers(JSON.parse(raw)); }catch(e){}
+paint();
+</script>
+</body>
+</html>
